@@ -1,16 +1,18 @@
 import { Header } from "./components/Header";
 import { Items } from "./components/Items";
-import Modal  from "./components/Modal";
+import { KartContextProvider } from "./store/kart-ctx";
+import { Footer } from "./components/Footer";
 
 function App() {
+ 
   return (
-    <>
-      <Header/>
+    <KartContextProvider>
+      <Header />
       <main>
-        <Items/>
+        <Items />
       </main>
-      <Modal open={false}>Modal</Modal>
-    </>
+      <Footer />
+    </KartContextProvider>
   );
 }
 
