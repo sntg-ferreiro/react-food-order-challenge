@@ -1,10 +1,9 @@
 import React, { useContext, useState } from "react";
 import { KartContext } from "../store/kart-ctx";
-import { Input } from "./UI/Input";
-import { useInput } from "../hooks/useInput";
-import { postOrder } from "../http";
+import Input from "./UI/Input";
 import Modal from "./UI/Modal";
 import { UserProgressContext } from "../store/UserProgressContext";
+import { postOrder } from "../http.js";
 
 const fieldIsNull = (field) => field === null;
 const fieldIsEmpty = (field) => field.trim() === "";
@@ -16,63 +15,34 @@ export const Checkout = () => {
     UserProgressContext
   );
 
-  const {
-    enteredValue: enteredName,
-    handleInputBlur: handleInputNameBlur,
-    handleValueChange: handleValueNameChange,
-    valueIsValid: nameIsValid,
-  } = useInput("", (f) => isValidField(f));
-  const {
-    enteredValue: enteredStreet,
-    handleInputBlur: handleInputStreetBlur,
-    handleValueChange: handleValueStreetChange,
-    valueIsValid: streetIsValid,
-  } = useInput("", (f) => isValidField(f));
-  const {
-    enteredValue: enteredPostal,
-    handleInputBlur: handleInputPostalBlur,
-    handleValueChange: handleValuePostalChange,
-    valueIsValid: postalIsValid,
-  } = useInput("", (f) => isValidField(f));
-  const {
-    enteredValue: enteredCity,
-    handleInputBlur: handleInputCityBlur,
-    handleValueChange: handleValueCityChange,
-    valueIsValid: cityIsValid,
-  } = useInput("", (f) => isValidField(f));
-  const {
-    enteredValue: enteredEmail,
-    handleInputBlur: handleInputEmailBlur,
-    handleValueChange: handleValueEmailChange,
-    valueIsValid: emailIsValid,
-  } = useInput("", (f) => isValidEmail(f));
+  const { items, totalPrice, refreshCtx } = useContext(KartContext);
 
-  const { loadKustomer } = useContext(KartContext);
-
-  const handleSubmit = (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
-    console.log("CUSTOMER SUBMITTED");
-    const enteredValues = {
-      email: enteredEmail,
-      name: enteredName,
-      street: enteredStreet,
-      "postal-code": enteredPostal,
-      city: enteredCity,
-    };
-    console.log(JSON.stringify(enteredValues));
-    loadKustomer(enteredValues);
-    hideCheckout();
-  };
 
-  async function handleCheckout() {
-    console.log("CHECKOUT!");
-    const response = await postOrder(items, kustomer);
-    if (response) {
-      refreshCtx();
+    const fd = new FormData(event.target);
+    const customerData = Object.fromEntries(fd.entries()); // { email: test@example.com }
+    try{
+      const response = await postOrder(items, customerData)
+      console.log(response)
+      hideCheckout()
+      refreshCtx()
+    }catch(error){
+      console.log(JSON.stringify(error.message))
     }
+    
   }
 
-  let modalActions = <button className="text-button">Close</button>;
+  let actions = (
+    <>
+      <button type="submit" className="button">
+        Checkout
+      </button>
+      <button type="button" className="text-button" onClick={hideCheckout}>
+        Close
+      </button>
+    </>
+  );
 
   return (
     <Modal
@@ -80,73 +50,16 @@ export const Checkout = () => {
       onClose={userProgress === KONSTANTS.CHECKOUT ? hideCheckout : null}
     >
       <form onSubmit={handleSubmit}>
-        <h2>Welcome on board!</h2>
-        <p>We just need a little bit of data from you to get your order 🚀</p>
-        <Input
-          id="name"
-          type="text"
-          name="name"
-          htmlForTag="name"
-          onBlur={handleInputNameBlur}
-          onChange={handleValueNameChange}
-          value={enteredName}
-          fieldIsInvalid={!nameIsValid && "Please check the entered Name"}
-          label="Name"
-        />
-        <Input
-          id="email"
-          type="email"
-          name="email"
-          htmlForTag="email"
-          onBlur={handleInputEmailBlur}
-          onChange={handleValueEmailChange}
-          value={enteredEmail}
-          fieldIsInvalid={!emailIsValid && "Please check the entered email"}
-          label="Email"
-        />
-        <Input
-          id="street"
-          type="text"
-          name="street"
-          htmlForTag="street"
-          onBlur={handleInputStreetBlur}
-          onChange={handleValueStreetChange}
-          value={enteredStreet}
-          fieldIsInvalid={!streetIsValid && "Please check the entered street"}
-          label="Street"
-        />
-        <Input
-          id="postal-code"
-          type="text"
-          name="postal-code"
-          htmlForTag="postal-code"
-          onBlur={handleInputPostalBlur}
-          onChange={handleValuePostalChange}
-          value={enteredPostal}
-          fieldIsInvalid={
-            !postalIsValid && "Please check the entered postal Code"
-          }
-          label="Postal Code"
-        />
-        <Input
-          id="city"
-          type="text"
-          name="city"
-          htmlForTag="city"
-          onBlur={handleInputCityBlur}
-          onChange={handleValueCityChange}
-          value={enteredCity}
-          fieldIsInvalid={!cityIsValid && "Please check the entered city"}
-          label="City"
-        />
-        <p className="modal-actions">
-          <button type="submit" className="button">
-            Checkout
-          </button>
-          <button type="button" className="text-button" onClick={hideCheckout}>
-            Close
-          </button>
-        </p>
+        <h2>Checkout</h2>
+        <p>Total amount: {totalPrice(items)}</p>
+        <Input label="Full Name" type="text" id="name" />
+        <Input label="E-Mail Address" type="email" id="email" />
+        <Input label="Street" type="text" id="street" />
+        <div className="control-row">
+          <Input label="Postal Code" type="text" id="postal-code" />
+          <Input label="City" type="text" id="city" />
+        </div>
+        <p className="modal-actions">{actions}</p>
       </form>
     </Modal>
   );

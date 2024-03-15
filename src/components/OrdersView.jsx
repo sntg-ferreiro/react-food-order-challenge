@@ -10,7 +10,7 @@ export const OrdersView = () => {
     fetchOrders,
     []
   );
-  const { userProgress, KONSTANTS, hideOrders, showOrders } = useContext(
+  const { userProgress, KONSTANTS, hideOrders } = useContext(
     UserProgressContext
   );
 

@@ -6,15 +6,12 @@ import { UserProgressContext } from "../store/UserProgressContext";
 import Modal from "./UI/Modal";
 
 export const Cart = () => {
-  const { items, updateQtyInCart } = useContext(KartContext);
+  const { items, updateQtyInCart, totalPrice } = useContext(KartContext);
   const { KONSTANTS, userProgress, hideKart, showCheckout } = useContext(
     UserProgressContext
   );
 
-  let totalPrice =
-    items.length > 0
-      ? items.map((i) => i.price * i.quantity).reduce((a, b) => a + b)
-      : 0;
+
 
   let modalActions = (
     <button className="text-button" onClick={hideKart}>
@@ -49,7 +46,8 @@ export const Cart = () => {
             );
           })}
         </ul>
-        <span>Total price: {Math.round(totalPrice * 100) / 100}</span>
+        {/*Math.round(totalPrice(items) * 100) / 100*/}
+        <span>Total price: {totalPrice(items)}</span>
         <p className="modal-actions">{modalActions}</p>
       </div>
     </Modal>

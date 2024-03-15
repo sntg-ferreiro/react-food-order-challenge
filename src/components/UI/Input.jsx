@@ -1,13 +1,8 @@
-import React from 'react'
-
-export const Input = ({label, htmlForTag, fieldIsInvalid, props}) => {
-  return (
-    <div className="control no-margin">
-      <label htmlFor={htmlForTag}>{label}</label>
-      <input {...props} />
-      <div className="control-error">
-        {fieldIsInvalid && <p>{fieldIsInvalid}</p>}
-      </div>
-    </div>
-  )
-}
+export default function Input({ label, id, ...props }) {
+    return (
+      <p className="control">
+        <label htmlFor={id}>{label}</label>
+        <input id={id} name={id} required {...props} />
+      </p>
+    );
+  }

@@ -1,7 +1,7 @@
 export const LOCAL_HOST = "http://localhost:3000/";
 
-async function fetchFromLocal(url, errmsg) {
-  const response = await fetch(LOCAL_HOST + url);
+async function fetchFromLocal(url, errmsg, body) {
+  const response = await fetch(LOCAL_HOST + url, body?body:undefined);
   if (!response.ok) {
     throw new Error(errmsg);
   }
@@ -25,16 +25,19 @@ export async function postOrder(kart, customer) {
   const order = { items: kart, customer };
   const body = JSON.stringify({ order });
   console.log(body);
-  const response = await fetchFromLocal(LOCAL_HOST + "orders", {
+  const response = await fetchFromLocal("orders", "Error fetching from /orders", {
     method: "POST",
     body: body,
     headers: {
       "Content-type": "application/json",
     },
   });
-  if (!response.ok) {
-    throw new Error("Error on update user places from /orders");
+  console.log('RESPONSE')
+  console.log(response)
+  /*if (response.status !== 201) {
+    throw new Error("Error on update user orders from /orders");
   }
   const data = await response.json();
-  return data.message;
+  */
+  return response.message;
 }

@@ -11,6 +11,7 @@ export const KartContext = createContext({
   addItemToCart: () => {},
   updateQtyInCart: () => {},
   refreshCtx: () => {},
+  totalPrice: () => {},
 });
 
 function shoppingCartReducer(state, action) {
@@ -105,6 +106,8 @@ export const KartContextProvider = ({ children }) => {
     setKustomer({...kustomer});
   }
 
+  
+  
   const ctxValue = {
     items: cartState.items,
     kustomer,
@@ -112,6 +115,9 @@ export const KartContextProvider = ({ children }) => {
     updateQtyInCart: handleUpdateCartItemQuantity,
     refreshCtx,
     loadKustomer,
+    totalPrice: (items) => Math.round((items.length > 0
+    ? items.map((i) => i.price * i.quantity).reduce((a, b) => a + b)
+    : 0)* 100)/100,
   };
 
   return (
